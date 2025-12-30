@@ -1,0 +1,19 @@
+{
+  "name": "life-plan",
+  "version": "1.0.0",
+  "description": "Personal life planning and review system based on Life Wheel methodology. Includes annual planning, monthly planning, and monthly review workflows.",
+  "author": {
+    "name": "charliec"
+  },
+  "repository": "https://github.com/charliec/life-plan-plugin",
+  "license": "MIT",
+  "keywords": [
+    "life-planning",
+    "annual-review",
+    "monthly-planning",
+    "okr",
+    "life-wheel",
+    "personal-development",
+    "goal-setting"
+  ]
+}

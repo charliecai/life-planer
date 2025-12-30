@@ -1,0 +1,32 @@
+{
+  "name": "life-plan-marketplace",
+  "owner": {
+    "name": "charliec",
+    "email": "your-email@example.com"
+  },
+  "metadata": {
+    "description": "Personal life planning tools based on Life Wheel methodology",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "life-plan",
+      "source": ".",
+      "description": "Personal life planning and review system with annual planning, monthly planning, and monthly review workflows based on Life Wheel methodology.",
+      "version": "1.0.0",
+      "author": {
+        "name": "charliec"
+      },
+      "license": "MIT",
+      "keywords": [
+        "life-planning",
+        "annual-review",
+        "monthly-planning",
+        "okr",
+        "life-wheel",
+        "personal-development"
+      ],
+      "category": "productivity"
+    }
+  ]
+}
