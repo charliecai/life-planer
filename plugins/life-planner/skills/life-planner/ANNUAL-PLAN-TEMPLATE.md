@@ -55,26 +55,7 @@ Use this template when generating annual planning documents.
 
 ---
 
-## 三、年度复盘洞察
-
-### Top 3 正反馈模式
-1. {pattern_1}
-2. {pattern_2}
-3. {pattern_3}
-
-### Top 3 代价模式
-1. {pattern_1}
-2. {pattern_2}
-3. {pattern_3}
-
-### Top 3 重复失败模式
-1. {pattern_1}
-2. {pattern_2}
-3. {pattern_3}
-
----
-
-## 四、年度战略定位
+## 三、年度战略定位
 
 ### 年度定位陈述
 > {1-3 sentences positioning statement}
@@ -95,7 +76,7 @@ Use this template when generating annual planning documents.
 
 ---
 
-## 五、年度 OKR（按主战场维度）
+## 四、年度 OKR（按主战场维度）
 
 ### 主战场 1：{dimension_name}
 
@@ -118,7 +99,7 @@ Use this template when generating annual planning documents.
 
 ---
 
-## 六、行动系统设计
+## 五、行动系统设计
 
 ### KR: {kr_name}
 
@@ -133,7 +114,7 @@ Use this template when generating annual planning documents.
 
 ---
 
-## 七、恢复与输入配额
+## 六、恢复与输入配额
 
 ### 恢复活动池
 | 活动 | 补能效果 | 占位方式 |
@@ -153,7 +134,7 @@ Use this template when generating annual planning documents.
 
 ---
 
-## 八、12周节奏规划
+## 七、12周节奏规划
 
 | 周期 | 主题词 | 对齐KR | 里程碑（可验收） | 主要风险与兜底 |
 |-----|-------|-------|----------------|---------------|

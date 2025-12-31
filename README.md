@@ -6,10 +6,12 @@ A personal strategic planning and execution system based on the Life Wheel metho
 
 ## Features
 
+- **Annual Review**: Comprehensive annual retrospective with pattern recognition
 - **Annual Planning**: Complete annual strategic planning workflow (Phase 0-8)
-- **Monthly Planning**: Monthly execution plans aligned with annual goals
 - **Monthly Review**: Structured monthly retrospectives with rolling adjustments
+- **Monthly Planning**: Monthly execution plans aligned with annual goals
 - **Life Wheel Assessment**: 8-dimension life balance evaluation
+- **Smart Pre-Check**: Automatically suggests review before planning
 
 ## Installation
 
@@ -90,11 +92,12 @@ Phase 10: Monthly Review ────┘
 
 The plugin helps you generate the following Markdown documents:
 
-| Document Type | Filename Format |
-|--------------|-----------------|
-| Annual Plan | `annual-plan-{year}.md` |
-| Monthly Plan | `monthly-plan-{year}-{month}.md` |
-| Monthly Review | `monthly-review-{year}-{month}.md` |
+| Document Type | Filename Format | Location |
+|--------------|-----------------|----------|
+| Annual Review | `annual-review-{year}.md` | `plans/{year}/` |
+| Annual Plan | `annual-plan-{year}.md` | `plans/{year}/` |
+| Monthly Review | `monthly-review-{year}-{month}.md` | `plans/{year}/` |
+| Monthly Plan | `monthly-plan-{year}-{month}.md` | `plans/{year}/` |
 
 ## Project Structure
 
@@ -109,9 +112,10 @@ life-planner/
 │       └── skills/
 │           └── life-planner/
 │               ├── SKILL.md                    # Main skill file
+│               ├── ANNUAL-REVIEW-TEMPLATE.md   # Annual review template
 │               ├── ANNUAL-PLAN-TEMPLATE.md     # Annual plan template
-│               ├── MONTHLY-PLAN-TEMPLATE.md    # Monthly plan template
-│               └── MONTHLY-REVIEW-TEMPLATE.md  # Monthly review template
+│               ├── MONTHLY-REVIEW-TEMPLATE.md  # Monthly review template
+│               └── MONTHLY-PLAN-TEMPLATE.md    # Monthly plan template
 └── README.md
 ```
 

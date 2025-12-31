@@ -1,7 +1,7 @@
 {
   "name": "life-planner",
-  "version": "1.0.0",
-  "description": "Personal life planning and review system based on Life Wheel methodology. Includes annual planning, monthly planning, and monthly review workflows.",
+  "version": "1.1.0",
+  "description": "Personal life planning tools based on Life Wheel methodology.",
   "author": {
     "name": "charliecai"
   },
@@ -10,7 +10,9 @@
   "keywords": [
     "life-planning",
     "annual-review",
+    "annual-planning",
     "monthly-planning",
+    "monthly-review",
     "okr",
     "life-wheel",
     "personal-development",
