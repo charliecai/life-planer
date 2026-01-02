@@ -16,11 +16,14 @@ A personal strategic planning and execution system based on the Life Wheel metho
 ## Installation
 
 ```bash
-# 1. Add the marketplace
+# 1. add marketplace
 /plugin marketplace add charliecai/life-planner
 
-# 2. Install the plugin
-/plugin install life-planner@charliecai-life-planner
+# 2. install plugin
+/plugin install life-planner@life-planner-marketplace
+
+# To uninstall
+/plugin uninstall life-planner@life-planner-marketplace
 ```
 
 ## Usage
