@@ -18,7 +18,10 @@
 /plugin marketplace add charliecai/life-planner
 
 # 2. 安装插件
-/plugin install life-planner@charliecai-life-planner
+/plugin install life-planner@life-planner-marketplace
+
+# 如果需要卸载
+/plugin uninstall life-planner@life-planner-marketplace
 ```
 
 ## 使用方法

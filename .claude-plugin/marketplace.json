@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "Personal life planning tools based on Life Wheel methodology",
-    "version": "1.1.0"
+    "version": "1.2.0"
   },
   "plugins": [
     {
       "name": "life-planner",
       "source": "./plugins/life-planner",
       "description": "Personal life planning and review system with annual planning, annual review, monthly planning, and monthly review workflows based on Life Wheel methodology.",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "author": {
         "name": "charliecai"
       },
@@ -26,7 +26,10 @@
         "life-wheel",
         "personal-development"
       ],
-      "category": "productivity"
+      "category": "productivity",
+      "skills": [
+        "./skills/life-planner"
+      ]
     }
   ]
 }

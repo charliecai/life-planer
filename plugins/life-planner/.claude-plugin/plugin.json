@@ -1,6 +1,6 @@
 {
   "name": "life-planner",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Personal life planning tools based on Life Wheel methodology.",
   "author": {
     "name": "charliecai"
@@ -17,5 +17,8 @@
     "life-wheel",
     "personal-development",
     "goal-setting"
+  ],
+  "skills": [
+    "./skills/life-planner"
   ]
 }
