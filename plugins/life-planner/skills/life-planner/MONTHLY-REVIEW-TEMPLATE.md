@@ -2,6 +2,27 @@
 
 Use this template when generating monthly review documents.
 
+**IMPORTANT: For document generation, use Bash heredoc method (see SKILL.md Method 1)**
+- This template is ~238 lines, which is too long for Write tool
+- **Generate ALL sections in ONE Bash call using { } braces**
+- **This ensures only ONE user confirmation is needed**
+- See SKILL.md "Document Generation Process" for detailed instructions
+
+**Batch Execution Format:**
+```bash
+{
+  cat > file.md << 'EOF'
+Section 0
+EOF
+
+  cat >> file.md << 'EOF'
+Section 1
+EOF
+
+  # ... all sections
+} && echo "✓ Done"
+```
+
 ## Document Structure
 
 ```markdown

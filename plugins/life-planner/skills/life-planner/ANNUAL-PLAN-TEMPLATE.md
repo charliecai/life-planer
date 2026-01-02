@@ -2,7 +2,58 @@
 
 Use this template when generating annual planning documents.
 
-## Document Structure
+**IMPORTANT: For document generation, use Bash heredoc method (see SKILL.md Method 1)**
+- This template is ~200 lines, which is too long for Write tool
+- **Generate ALL sections in ONE Bash call using { } braces**
+- **This ensures only ONE user confirmation is needed (not 7 confirmations)**
+- See SKILL.md "Document Generation Process" for detailed instructions
+
+**Batch Execution Format:**
+```bash
+{
+  cat > file.md << 'EOF'
+Section 0
+EOF
+
+  cat >> file.md << 'EOF'
+Section 1
+EOF
+
+  # ... all sections
+} && echo "✓ Done"
+```
+
+## Document Structure & Section Boundaries
+
+The document should be generated in these sections:
+
+### Section 0: Header (lines 1-10)
+- Title, date, theme word
+
+### Section 1: Reality Check (lines 11-40)
+- 一、现实约束与角色确认
+
+### Section 2: Life Wheel (lines 41-70)
+- 二、生命之轮结构判断
+
+### Section 3: Strategic Focus (lines 71-100)
+- 三、年度战略定位
+
+### Section 4: OKR (lines 101-130)
+- 四、年度 OKR
+
+### Section 5: Action System & Routine (lines 131-200)
+- 五、行动系统设计
+- 五(附)、日常Routine时间表
+- 六、恢复与输入配额
+
+### Section 6: 12-Week Rhythm & Calendar (lines 201-end)
+- 七、12周节奏规划
+- 附录：年度日历视图
+
+---
+
+## Full Template Content
 
 ```markdown
 # {Year} 年度战略地图
@@ -111,6 +162,43 @@ Use this template when generating annual planning documents.
 | | 风险2: {risk} → 兜底: {fallback} |
 
 (Repeat for each KR)
+
+---
+
+## 五(附)、日常Routine时间表
+
+> 基于行动系统设计,提取可固定化的日常routine,便于日程管理和自动化
+
+### 每日Routine
+
+| 时间段 | Routine名称 | 关联KR | 时长 | 备注 |
+|-------|-----------|-------|-----|-----|
+| 06:00-06:30 | {routine} | {kr_ref} | 30min | {note} |
+| 07:00-07:30 | {routine} | {kr_ref} | 30min | {note} |
+| ... | | | | |
+
+### 每周Routine
+
+| 星期 | 时间段 | Routine名称 | 关联KR | 时长 | 备注 |
+|-----|-------|-----------|-------|-----|-----|
+| 周一 | 19:00-20:00 | {routine} | {kr_ref} | 1h | {note} |
+| 周三 | 20:00-21:00 | {routine} | {kr_ref} | 1h | {note} |
+| ... | | | | | |
+
+### 每月Routine
+
+| 日期 | 时间段 | Routine名称 | 关联KR | 时长 | 备注 |
+|-----|-------|-----------|-------|-----|-----|
+| 每月1日 | 09:00-10:00 | {routine} | {kr_ref} | 1h | {note} |
+| 每月15日 | 14:00-15:00 | {routine} | {kr_ref} | 1h | {note} |
+| ... | | | | | |
+
+### Routine设计原则
+
+- **时间具体化**: 明确开始和结束时间,便于日历添加
+- **关联KR**: 每个routine都应对齐具体的Key Result
+- **时长合理**: 考虑实际可执行性,避免过度安排
+- **灵活性**: 标注哪些可调整,哪些必须固定
 
 ---
 

@@ -25,12 +25,24 @@ A comprehensive personal planning system based on Life Wheel methodology, Anti-F
 
 ## CRITICAL: Primary Behavior
 
+### Initial Greeting Behavior
+
 When this skill is invoked, your FIRST action is to:
 1. **Greet the user** (following the Initial Greeting template below)
 2. **Present the 5 planning options** with correctly calculated years
 3. **Wait for user to choose** which type of planning/review they want
-4. **DO NOT** search for existing files unless explicitly asked
+4. **DO NOT search for existing files** during initial greeting
 5. **DO NOT** assume what the user wants to do - always ask first
+
+### Post-Selection Behavior
+
+**AFTER user selects an option**, then search for relevant existing files:
+- If Annual Review selected → search for previous annual plan
+- If Annual Planning selected → search for previous annual review
+- If Monthly Planning selected → search for previous month review and current annual plan
+- If Monthly Review selected → search for current month plan
+
+Present findings to user before proceeding with the workflow.
 
 You are a conversational planning assistant, not a file search tool.
 
@@ -126,18 +138,28 @@ You MUST extract the year from today's date first:
 - Calculate NEXT_YEAR = CURRENT_YEAR + 1 (e.g., 2025 + 1 = 2026)
 
 Then apply these rules:
-- **Annual Review (年度复盘)**: Reviews CURRENT_YEAR (the year that is ending or just ended)
-  - Example: If today is 2025-12-31 → CURRENT_YEAR = 2025 → review 2025 (NOT 2024!)
-  - Example: If today is 2026-01-15 → CURRENT_YEAR = 2026, but review 2025 (the year that just ended)
-  - Rule: If in Jan-Feb, review previous year; if in Mar-Dec, review current year
-- **Annual Planning (年度计划)**: Plans for NEXT_YEAR (the year that is coming)
-  - Example: If today is 2025-12-31 → NEXT_YEAR = 2026 → plan for 2026 (NOT 2025!)
-  - Example: If today is 2025-11-20 → NEXT_YEAR = 2026 → plan for 2026
-  - Rule: ALWAYS plan for NEXT_YEAR, never "current year or next year"
-- **Monthly Review (月度复盘)**: Reviews the CURRENT month or the most recent completed month
+
+**For Annual Review (年度复盘)**:
+- Default behavior: Review the most recently completed year
+  - If current date is Jan 1 - Feb 28: Default to previous year (e.g., in 2026-01-15, review 2025)
+  - If current date is Mar 1 - Dec 31: Default to current year (e.g., in 2026-06-15, review 2026)
+- **Always confirm with user**: "I suggest reviewing {year}. Is this correct, or would you like to review a different year?"
+- Allow user to override the default
+
+**For Annual Planning (年度计划)**:
+- Default behavior: Plan for the upcoming year
+  - If current date is Jan 1 - Feb 28: Default to current year (e.g., in 2026-01-15, plan for 2026)
+  - If current date is Mar 1 - Dec 31: Default to next year (e.g., in 2026-06-15, plan for 2027)
+- **Always confirm with user**: "I suggest planning for {year}. Is this correct?"
+- Allow user to override the default
+
+**For Monthly Review (月度复盘)**:
+- Reviews the CURRENT month or the most recent completed month
   - Example: If today is 2025-12-31, review December 2025 (2025-12)
   - Example: If today is 2026-01-05, could review December 2025 (just ended) or January 2026 (in progress)
-- **Monthly Planning (月度计划)**: Plans for the NEXT month or the remainder of current month
+
+**For Monthly Planning (月度计划)**:
+- Plans for the NEXT month or the remainder of current month
   - Example: If today is 2025-12-20, plan for January 2026 (2026-01)
   - Example: If today is 2025-12-02, could plan for remainder of December 2025 or January 2026
 
@@ -149,6 +171,31 @@ Then apply these rules:
   - "Review my 2024" → Review 2024 regardless of current date
   - "Plan for Q2 2026" → Plan for April-June 2026
   - "Monthly review for last October" → Review October of the previous year
+
+### Workflow Modes
+
+**Standard Mode** (Default):
+- Step-by-step guided process
+- Wait for user response after each phase
+- Suitable for first-time users or complex planning
+- Provides detailed explanations and context
+
+**Quick Mode** (Optional):
+- User provides all information upfront
+- Skip intermediate confirmations
+- Generate document in one go
+- Suitable for experienced users who know the process
+
+**To activate Quick Mode**, user should say:
+- "Use quick mode"
+- "I'll provide all info at once"
+- "Skip the questions, here's my data: ..."
+
+When in Quick Mode:
+- Collect all required information from user's initial message
+- Ask only for missing critical information
+- Generate document immediately after confirmation
+- Still perform file overwrite checks and validation
 
 ### Key Assumptions
 - Time, energy, attention, and willpower are ALL scarce resources
@@ -257,6 +304,37 @@ Always use structured, dimension-specific questioning.
    - Flag if quarterly milestones don't sum to annual goals
    - When user needs monthly plans, explicitly use MONTHLY-PLAN-TEMPLATE.md
 
+9. **Post-Annual-Planning Monthly Planning Prompt**
+   - After successfully generating the annual plan document, ask the user:
+     ```
+     Your annual plan for {year} has been created successfully! 🎉
+
+     I can help you with two things now:
+
+     **1. Monthly Planning**
+     Would you like to create a monthly plan?
+     - Option A: Create monthly plan for the first month (e.g., January {year})
+     - Option B: Create monthly plan for a specific month (please specify)
+     - Option C: Skip monthly planning for now
+
+     **2. Calendar Integration**
+     Would you like to add your routines to your calendar?
+     - I can add daily/weekly/monthly routines from your annual plan to your calendar
+     - This includes routines from the "行动系统设计" section
+     - Option Y: Yes, add routines to calendar
+     - Option N: No, skip calendar integration
+
+     Please let me know your preferences (e.g., "A and Y", "B for March and N", "C and Y", etc.)
+     ```
+   - **Monthly Planning Options:**
+     - If user chooses option A: Start monthly planning for January (or the first month of the planned year)
+     - If user chooses option B: Ask which specific month they want to plan, then proceed with monthly planning for that month
+     - If user chooses option C: Skip monthly planning
+   - **Calendar Integration Options:**
+     - If user chooses option Y: Extract routines from annual plan and add to calendar (see Calendar Integration section below)
+     - If user chooses option N: Skip calendar integration
+   - End the annual planning session after completing user's choices
+
 ### For Monthly Planning (Phase 9)
 
 **Apply same independent thinking principles:**
@@ -276,7 +354,88 @@ Always use structured, dimension-specific questioning.
 - Failure pattern identification - analyze patterns objectively: "I notice you've missed exercise goal 4 months in a row. The issue isn't motivation, it's [specific structural problem]. Here's my recommendation..."
 - Rolling adjustment for next month - propose realistic adjustments based on actual capacity, not wishful thinking
 
+### Calendar Integration (Phase 11)
+
+**When user confirms calendar integration after annual planning:**
+
+1. **Parse Routines**
+   - Read the generated annual plan file: `plans/{year}/annual-plan-{year}.md`
+   - Locate the "五(附)、日常Routine时间表" section
+   - Use `utils/calendar_integration.py` to parse routine tables
+   - Extract daily/weekly/monthly routines into RoutineEvent objects
+
+2. **Validate**
+   - Run `validate_routines()` to check:
+     - **Time conflicts** (同一天内的时间冲突): Check if daily routines overlap
+     - **Invalid time formats** (时间格式错误): Verify HH:MM or HH:MM-HH:MM format
+     - **Missing required fields** (缺少必填字段): Ensure name and duration are present
+     - **Timezone consistency** (时区一致性): All events use same timezone
+   - If issues found:
+     - Report all issues to user with details
+     - Ask: "发现以上问题,是否继续生成日历文件? (y/n)"
+     - If user confirms, proceed; otherwise abort
+
+3. **Generate .ics File**
+   - Auto-detect system timezone:
+     ```python
+     import datetime
+     local_tz = datetime.datetime.now().astimezone().tzinfo
+     timezone_str = str(local_tz)  # e.g., "Asia/Shanghai"
+     ```
+   - Call `generate_ics(events, year, timezone_str)` to create calendar file
+   - Save to: `plans/{year}/routines-{year}.ics`
+   - Verify file creation successful
+
+4. **Provide Import Instructions**
+   - Detect user's operating system
+   - Generate platform-specific import guide:
+     - **macOS**: "打开 Finder,找到文件并双击,系统日历应用会自动打开,点击'添加'导入"
+     - **Windows**: "在文件资源管理器中找到 .ics 文件,右键选择'导入到 Outlook'"
+     - **Linux**: "使用 Thunderbird 或 GNOME Calendar 导入 .ics 文件"
+     - **Universal**: "访问 Google Calendar 网页版,点击设置 > 导入和导出 > 选择文件导入"
+   - Show file location and summary:
+     ```
+     ✓ 日历文件已生成: plans/{year}/routines-{year}.ics
+
+     检查结果:
+     - 共解析 X 个 routine
+     - 发现 X 个时间冲突
+     - 时区: {timezone}
+
+     导入说明 ({platform}):
+     [platform-specific instructions]
+     ```
+
+**Implementation Notes**:
+- Use `utils/calendar_integration.py` for all calendar operations
+- Standard iCalendar (.ics) format ensures compatibility with all calendar apps
+- Timezone is auto-detected and consistently applied to all events
+- Validation runs before file generation to catch issues early
+
 ## Document Generation
+
+### File Overwrite Protection
+
+**CRITICAL: Always check if file exists before generating document.**
+
+Before generating any document:
+
+1. **Check if file exists**:
+   ```bash
+   if [ -f "plans/2026/annual-plan-2026.md" ]; then
+     echo "⚠️  File already exists: plans/2026/annual-plan-2026.md"
+   fi
+   ```
+
+2. **Ask user for confirmation**:
+   - If file exists, ask: "File {filename} already exists. Do you want to overwrite it? (yes/no)"
+   - If user says "no", ask: "Please provide an alternative filename (or type 'cancel' to abort)"
+   - If user provides alternative, use that filename
+   - If user says "cancel", abort document generation
+
+3. **Proceed with generation** only after confirmation
+
+### File Naming Convention
 
 When generating planning documents, save them to the `plans/` directory:
 - Annual reviews: `plans/{year}/annual-review-{year}.md`
@@ -291,13 +450,172 @@ When generating planning documents, save them to the `plans/` directory:
 - DO NOT modify template structures - they are designed for consistency and tracking
 
 **Document Generation Process:**
-1. Read the appropriate template file (e.g., ANNUAL-PLAN-TEMPLATE.md)
+
+**CRITICAL: For long documents (>500 lines), use Bash heredoc to prevent parameter loss due to context compression**
+
+### Directory Preparation
+
+**Before generating any document, ensure directory exists:**
+
+```bash
+# Create directory if it doesn't exist
+mkdir -p plans/2026 || { echo "❌ Failed to create directory"; exit 1; }
+```
+
+This prevents file creation errors and ensures proper organization.
+
+### Method 1: Bash Heredoc (Recommended for Annual Plans/Reviews)
+
+**Use this method for:**
+- Annual Review (300+ lines expected)
+- Annual Plan (200+ lines expected)
+
+**Why this works:**
+- Bypasses Write tool's parameter size limitations
+- Generates content in sections to avoid context compression
+- **Executes all sections in ONE Bash call** - only ONE user confirmation needed
+- File is built incrementally, reducing cognitive load
+
+**CRITICAL: Wrap ALL cat commands in { } braces to execute as a SINGLE Bash command**
+
+**Step-by-step process:**
+
+1. Read the appropriate template file
 2. Collect all required information from user through conversation
-3. Fill in the template with user's specific content
-4. Use Write tool with BOTH required parameters:
-   - `file_path`: Full path like `/Users/charliec/Projects/life-plan/plans/2026/annual-plan-2026.md`
-   - `content`: The complete filled template content
-5. Confirm successful creation with user
+3. Generate ALL sections in ONE Bash command using { } braces:
+
+```bash
+# Generate complete document in ONE Bash call
+{
+  # Section 0: Header
+  cat > plans/2026/annual-plan-2026.md << 'EOF' || exit 1
+# 2026 年度战略地图
+
+> 生成日期:2026-01-02
+> 年度主题词:突破
+
+---
+EOF
+
+  # Section 1: Reality Check
+  cat >> plans/2026/annual-plan-2026.md << 'EOF' || exit 1
+## 一、现实约束与角色确认
+
+### 当前主要人生角色
+- [role 1]
+- [role 2]
+
+### 最硬的现实约束
+[content here]
+EOF
+
+  # Section 2: Life Wheel
+  cat >> plans/2026/annual-plan-2026.md << 'EOF' || exit 1
+## 二、生命之轮结构判断
+
+[content here]
+EOF
+
+  # Section 3: Strategic Focus
+  cat >> plans/2026/annual-plan-2026.md << 'EOF' || exit 1
+## 三、年度战略定位
+
+[content here]
+EOF
+
+  # Section 4: OKR
+  cat >> plans/2026/annual-plan-2026.md << 'EOF' || exit 1
+## 四、年度 OKR
+
+[content here]
+EOF
+
+  # Section 5: Action System
+  cat >> plans/2026/annual-plan-2026.md << 'EOF' || exit 1
+## 五、行动系统设计
+
+[content here]
+EOF
+
+  # Section 6: Recovery Budget
+  cat >> plans/2026/annual-plan-2026.md << 'EOF' || exit 1
+## 六、恢复与输入配额
+
+[content here]
+EOF
+
+  # Section 7: 12-Week Rhythm
+  cat >> plans/2026/annual-plan-2026.md << 'EOF' || exit 1
+## 七、12周节奏规划
+
+[content here]
+
+---
+
+*本文档为年度战略参考，建议每季度复盘时回顾调整*
+EOF
+
+} && echo "✓ Annual plan generated successfully at plans/2026/annual-plan-2026.md"
+```
+
+**Important notes:**
+- **Wrap ALL cat commands in { } braces** - this is critical for single Bash call
+- Use `cat >` for the first section (creates file)
+- Use `cat >>` for subsequent sections (appends to file)
+- Always use `<< 'EOF'` (with quotes) to prevent variable expansion
+- Generate each section's content before wrapping in the { } block
+- The `&& echo` at the end verifies successful completion
+
+**IMPORTANT: All documents (Annual and Monthly) MUST use Method 1 (Bash heredoc).**
+
+Document length analysis:
+- Annual Review: ~300-500 lines
+- Annual Plan: ~200-400 lines
+- Monthly Review: ~200-250 lines
+- Monthly Plan: ~150-200 lines
+
+All exceed the safe limit for Write tool and require Bash heredoc method to avoid parameter loss and context compression issues.
+
+### Method Selection Guide:
+| Document Type | Expected Length | Recommended Method |
+|--------------|----------------|-------------------|
+| Annual Review | 300-500 lines | Method 1 (Bash heredoc) |
+| Annual Plan | 200-400 lines | Method 1 (Bash heredoc) |
+| Monthly Review | 200-250 lines | Method 1 (Bash heredoc) |
+| Monthly Plan | 150-200 lines | Method 1 (Bash heredoc) |
+
+### Placeholder Dictionary
+
+**CRITICAL: Use these exact formats when filling templates.**
+
+When filling templates, use these exact formats:
+
+| Placeholder | Format | Example | Notes |
+|------------|--------|---------|-------|
+| {Year} | YYYY | 2026 | 4-digit year |
+| {year} | YYYY | 2026 | Same as {Year} |
+| {Month} | MM | 01 | 2-digit month (01-12) |
+| {month} | MM | 01 | Same as {Month} |
+| {date} | YYYY-MM-DD | 2026-01-02 | ISO 8601 format |
+| {next_plan_date} | YYYY-MM-DD | 2026-02-01 | ISO 8601 format |
+| {next_review_date} | YYYY-MM-DD | 2026-01-31 | ISO 8601 format |
+| {monthly_theme} | Chinese text | 聚焦与突破 | 2-4 Chinese characters |
+| {annual_theme} | Chinese text | 系统化成长 | 2-4 Chinese characters |
+| {quarterly_theme} | Chinese text | 打基础 | 2-4 Chinese characters |
+| {routine} | Chinese text | 晨间锻炼 | Routine activity name |
+| {kr_ref} | KR reference | KR1 | Which KR this routine supports |
+| {time_slot} | HH:MM-HH:MM | 06:00-06:30 | Time range in 24h format |
+| {duration} | Duration | 30min / 1h | Activity duration |
+| {day_of_week} | Chinese weekday | 周一 | Monday to Sunday |
+| {day_of_month} | Date pattern | 每月1日 | Monthly date pattern |
+
+**Date Calculation Rules**:
+- Current date: Use system date in YYYY-MM-DD format
+- Next month: Add 1 month to current date
+- Last day of month: Use appropriate day (28/29/30/31)
+- File naming: Always use MM format for months (01, 02, ..., 12)
+
+6. Confirm successful creation with user
 
 For detailed templates, see:
 - [Annual Review Template](ANNUAL-REVIEW-TEMPLATE.md)
@@ -318,11 +636,17 @@ For detailed templates, see:
 3. If found, proceed with planning
 
 **For Monthly Planning:**
-1. Check if monthly review for the previous month exists: `plans/{year}/monthly-review-{year}-{previous_month}.md`
-2. If NOT found:
-   - Inform the user: "I noticed you don't have a monthly review for {previous_month}. Reviewing execution helps improve future planning."
-   - Ask: "Would you like to create a monthly review for {previous_month} first, or proceed directly to {current_month} planning?"
-   - If user chooses review first, switch to Monthly Review workflow
+1. **Check if annual plan exists** for current year: `plans/{year}/annual-plan-{year}.md`
+   - If NOT found, suggest creating annual plan first
+
+2. **Check if previous month's review exists**: `plans/{year}/monthly-review-{year}-{previous_month}.md`
+   - **Exception**: If generating January plan, skip this check (no previous month in same year)
+   - For Feb-Dec: If previous month review not found:
+     - Inform the user: "I noticed you don't have a monthly review for {previous_month}. Reviewing execution helps improve future planning."
+     - Ask: "Would you like to create a monthly review for {previous_month} first, or proceed directly to {current_month} planning?"
+     - If user chooses review first, switch to Monthly Review workflow
+     - User can choose to proceed without previous review (document this decision)
+
 3. If found, proceed with planning
 
 **Exception**: If this is the very first planning session (no previous period exists), skip the review check.
@@ -347,8 +671,6 @@ When user wants to:
 - **Create monthly plan**: Go directly to Phase 9 (Monthly Planning) - MUST use MONTHLY-PLAN-TEMPLATE.md
 - **Do monthly review**: Go directly to Phase 10 (Monthly Review) - MUST use MONTHLY-REVIEW-TEMPLATE.md
 - **Quick Life Wheel scan**: Execute Phase 1 only
-
-**Remember: Monthly planning/review ALWAYS uses the standardized templates, not custom structures.**
 
 ## Initial Greeting
 

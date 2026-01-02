@@ -2,7 +2,60 @@
 
 Use this template when generating annual review documents.
 
-## Document Structure
+**IMPORTANT: For document generation, use Bash heredoc method (see SKILL.md Method 1)**
+- This template is ~300 lines, which is too long for Write tool
+- **Generate ALL sections in ONE Bash call using { } braces**
+- **This ensures only ONE user confirmation is needed (not 12 confirmations)**
+- See SKILL.md "Document Generation Process" for detailed instructions
+
+**Batch Execution Format:**
+```bash
+{
+  cat > file.md << 'EOF'
+Section 0
+EOF
+
+  cat >> file.md << 'EOF'
+Section 1
+EOF
+
+  # ... all sections
+} && echo "✓ Done"
+```
+
+## Document Structure & Section Boundaries
+
+The document should be generated in these sections:
+
+### Section 0: Header (lines 1-15)
+- Title, date, review period
+
+### Section 1: Annual Overview (lines 16-40)
+- I. Annual Overview
+
+### Section 2: Life Wheel Assessment (lines 41-80)
+- II. Life Wheel - 8 Dimensions Review
+
+### Section 3-10: Individual Dimensions (lines 81-240, ~20 lines each)
+- III. Health
+- IV. Career/Studies
+- V. Wealth/Financial Security
+- VI. Family
+- VII. Intimate Relationships
+- VIII. Social/Friends
+- IX. Personal Growth
+- X. Leisure/Recovery
+
+### Section 11: Patterns & Insights (lines 241-270)
+- XI. Cross-Dimensional Patterns
+
+### Section 12: Lessons & Gratitude (lines 271-end)
+- XII. Key Lessons Learned
+- XIII. Gratitude List
+
+---
+
+## Full Template Content
 
 ```markdown
 # {Year} Annual Review
