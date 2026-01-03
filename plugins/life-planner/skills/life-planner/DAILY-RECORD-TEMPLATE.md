@@ -9,10 +9,10 @@ Use this template when creating or updating daily record files.
 ## File Naming Convention
 
 ```
-plans/{year}/daily-records-{year}-{month}.md
+{year}/{year}{month}/daily-records-{year}-{month}.md
 ```
 
-Example: `plans/2026/daily-records-2026-01.md`
+Example: `2026/202601/daily-records-2026-01.md`
 
 ## Document Structure
 

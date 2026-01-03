@@ -1,16 +1,10 @@
 ---
 name: life-planner
 description: |
-  Personal life planning and review system based on Life Wheel methodology.
-  Acts as an INDEPENDENT strategic advisor who challenges assumptions,
-  provides evidence-based recommendations, and maintains professional skepticism.
-  Use when: annual planning, annual review, monthly planning, monthly review,
-  goal setting, life balance assessment, OKR creation, daily record, or when user mentions
-  keywords like "年度计划", "制定年度计划", "年度规划", "做年度计划",
-  "年度复盘", "年度回顾", "年度总结", "月度计划", "制定月度计划",
-  "月度规划", "月度复盘", "月度回顾", "月度总结", "生命之轮",
-  "人生规划", "目标设定", "OKR", "战略规划", "personal planning",
-  "添加记录", "记录:", "添加记录:", "每日记录", "daily record".
+  制定年度计划、制定月度计划、记录日常活动、生命之轮评估、年度计划、年度规划、年度复盘、月度计划、月度复盘、每日记录。
+  Use for: 制定年度计划, 做年度计划, 年度回顾, 年度总结, 制定月度计划, 月度规划,
+  月度回顾, 月度总结, 人生规划, 目标设定, OKR, 战略规划, 添加记录, 记录日常活动。
+  Triggers: annual plan, annual review, monthly plan, monthly review, life wheel, daily record.
 ---
 
 # Life Planner - Personal Strategic Planning System
@@ -224,7 +218,7 @@ When in Quick Mode:
 **CRITICAL: Check for existing annual plan first**
 
 Before starting the annual review:
-1. Check if annual plan exists: `plans/{review_year}/annual-plan-{review_year}.md`
+1. Check if annual plan exists: `{review_year}/annual-plan-{review_year}.md`
 2. Choose the appropriate workflow based on what you find:
 
 **Workflow A: Annual plan exists**
@@ -351,7 +345,7 @@ Always use structured, dimension-specific questioning.
 
 Before starting the review, check if daily records exist for the review month:
 
-1. **Check file**: `plans/{year}/daily-records-{year}-{month}.md`
+1. **Check file**: `{year}/{year}{month}/daily-records-{year}-{month}.md`
 2. **If exists**, read and present summary:
    ```
    📊 本月每日记录摘要:
@@ -404,7 +398,7 @@ After completing the monthly review document generation, prompt user for next st
 **When user confirms calendar integration after annual planning:**
 
 1. **Parse Routines**
-   - Read the generated annual plan file: `plans/{year}/annual-plan-{year}.md`
+   - Read the generated annual plan file: `{year}/annual-plan-{year}.md`
    - Locate the "五(附)、日常Routine时间表" section
    - Use `utils/calendar_integration.py` to parse routine tables
    - Extract daily/weekly/monthly routines into RoutineEvent objects
@@ -414,7 +408,7 @@ After completing the monthly review document generation, prompt user for next st
    Before generating calendar, check if first month's plan exists:
 
    1. **Determine first month** of the planned year (typically January, or current month if mid-year)
-   2. **Check file**: `plans/{year}/monthly-plan-{year}-01.md`
+   2. **Check file**: `{year}/{year}01/monthly-plan-{year}-01.md`
    3. **If NOT exists**:
       - Inform user:
         ```
@@ -445,7 +439,7 @@ After completing the monthly review document generation, prompt user for next st
      timezone_str = str(local_tz)  # e.g., "Asia/Shanghai"
      ```
    - Call `generate_ics(events, year, timezone_str)` to create calendar file
-   - Save to: `plans/{year}/routines-{year}.ics`
+   - Save to: `{year}/routines-{year}.ics`
    - Verify file creation successful
 
 5. **Provide Import Instructions**
@@ -457,7 +451,7 @@ After completing the monthly review document generation, prompt user for next st
      - **Universal**: "访问 Google Calendar 网页版,点击设置 > 导入和导出 > 选择文件导入"
    - Show file location and summary:
      ```
-     ✓ 日历文件已生成: plans/{year}/routines-{year}.ics
+     ✓ 日历文件已生成: {year}/routines-{year}.ics
 
      检查结果:
      - 共解析 X 个 routine
@@ -533,7 +527,7 @@ When user input matches any of these patterns, activate Daily Record workflow:
    Before adding any record, check if a monthly plan exists for the target month:
 
    1. **Determine target month** from resolved date (step 2)
-   2. **Check file**: `plans/{year}/monthly-plan-{year}-{month}.md`
+   2. **Check file**: `{year}/{year}{month}/monthly-plan-{year}-{month}.md`
    3. **If NOT exists**:
       - Inform user:
         ```
@@ -547,12 +541,12 @@ When user input matches any of these patterns, activate Daily Record workflow:
 
 6. **File Operations**
 
-   **File path**: `plans/{year}/daily-records-{year}-{month}.md`
+   **File path**: `{year}/{year}{month}/daily-records-{year}-{month}.md`
 
    Based on the resolved date, determine which month's file to update.
 
    **If file doesn't exist**:
-   - Create directory: `mkdir -p plans/{year}`
+   - Create directory: `mkdir -p {year}/{year}{month}`
    - Create new file using DAILY-RECORD-TEMPLATE.md structure
    - Add the first record to appropriate category table
 
@@ -576,7 +570,7 @@ When user input matches any of these patterns, activate Daily Record workflow:
    内容: {content}
    {金额: {amount}元}  ← only for 消费支出
 
-   文件: plans/{year}/daily-records-{year}-{month}.md
+   文件: {year}/{year}{month}/daily-records-{year}-{month}.md
    ```
 
 **Example Usage:**
@@ -586,7 +580,7 @@ User: 记录:今天跑步5公里
 → Date: 2026-01-03
 → Category: 运动健身
 → Content: 今天跑步5公里
-→ File: plans/2026/daily-records-2026-01.md
+→ File: 2026/202601/daily-records-2026-01.md
 
 User: 昨天:和小明聚餐
 → Date: 2026-01-02
@@ -610,7 +604,7 @@ User: 1月1日:新年第一天,定了全年目标
 During Monthly Review (Phase 10), the system should leverage daily records:
 
 1. **Check for daily records file**
-   - Look for: `plans/{year}/daily-records-{year}-{month}.md`
+   - Look for: `{year}/{year}{month}/daily-records-{year}-{month}.md`
    - If exists, read and extract summary data
 
 2. **Present summary to user**
@@ -637,8 +631,8 @@ Before generating any document:
 
 1. **Check if file exists**:
    ```bash
-   if [ -f "plans/2026/annual-plan-2026.md" ]; then
-     echo "⚠️  File already exists: plans/2026/annual-plan-2026.md"
+   if [ -f "2026/annual-plan-2026.md" ]; then
+     echo "⚠️  File already exists: 2026/annual-plan-2026.md"
    fi
    ```
 
@@ -652,11 +646,27 @@ Before generating any document:
 
 ### File Naming Convention
 
-When generating planning documents, save them to the `plans/` directory:
-- Annual reviews: `plans/{year}/annual-review-{year}.md`
-- Annual plans: `plans/{year}/annual-plan-{year}.md`
-- Monthly reviews: `plans/{year}/monthly-review-{year}-{month}.md`
-- Monthly plans: `plans/{year}/monthly-plan-{year}-{month}.md`
+When generating planning documents, use this directory structure:
+- Annual reviews: `{year}/annual-review-{year}.md`
+- Annual plans: `{year}/annual-plan-{year}.md`
+- Calendar files: `{year}/routines-{year}.ics`
+- Monthly reviews: `{year}/{year}{month}/monthly-review-{year}-{month}.md`
+- Monthly plans: `{year}/{year}{month}/monthly-plan-{year}-{month}.md`
+- Daily records: `{year}/{year}{month}/daily-records-{year}-{month}.md`
+
+**Directory structure example**:
+```
+2026/
+├── annual-plan-2026.md
+├── annual-review-2026.md
+├── routines-2026.ics
+├── 202601/
+│   ├── monthly-plan-2026-01.md
+│   ├── monthly-review-2026-01.md
+│   └── daily-records-2026-01.md
+└── 202612/
+    └── ...
+```
 
 **CRITICAL: Use standardized templates consistently**
 - ALWAYS use the official template files from this skill directory
@@ -673,8 +683,11 @@ When generating planning documents, save them to the `plans/` directory:
 **Before generating any document, ensure directory exists:**
 
 ```bash
-# Create directory if it doesn't exist
-mkdir -p plans/2026 || { echo "❌ Failed to create directory"; exit 1; }
+# For annual documents - create year directory
+mkdir -p 2026 || { echo "❌ Failed to create directory"; exit 1; }
+
+# For monthly documents - create year and month directory
+mkdir -p 2026/202601 || { echo "❌ Failed to create directory"; exit 1; }
 ```
 
 This prevents file creation errors and ensures proper organization.
@@ -703,7 +716,7 @@ This prevents file creation errors and ensures proper organization.
 # Generate complete document in ONE Bash call
 {
   # Section 0: Header
-  cat > plans/2026/annual-plan-2026.md << 'EOF' || exit 1
+  cat > 2026/annual-plan-2026.md << 'EOF' || exit 1
 # 2026 年度战略地图
 
 > 生成日期:2026-01-02
@@ -713,7 +726,7 @@ This prevents file creation errors and ensures proper organization.
 EOF
 
   # Section 1: Reality Check
-  cat >> plans/2026/annual-plan-2026.md << 'EOF' || exit 1
+  cat >> 2026/annual-plan-2026.md << 'EOF' || exit 1
 ## 一、现实约束与角色确认
 
 ### 当前主要人生角色
@@ -725,42 +738,42 @@ EOF
 EOF
 
   # Section 2: Life Wheel
-  cat >> plans/2026/annual-plan-2026.md << 'EOF' || exit 1
+  cat >> 2026/annual-plan-2026.md << 'EOF' || exit 1
 ## 二、生命之轮结构判断
 
 [content here]
 EOF
 
   # Section 3: Strategic Focus
-  cat >> plans/2026/annual-plan-2026.md << 'EOF' || exit 1
+  cat >> 2026/annual-plan-2026.md << 'EOF' || exit 1
 ## 三、年度战略定位
 
 [content here]
 EOF
 
   # Section 4: OKR
-  cat >> plans/2026/annual-plan-2026.md << 'EOF' || exit 1
+  cat >> 2026/annual-plan-2026.md << 'EOF' || exit 1
 ## 四、年度 OKR
 
 [content here]
 EOF
 
   # Section 5: Action System
-  cat >> plans/2026/annual-plan-2026.md << 'EOF' || exit 1
+  cat >> 2026/annual-plan-2026.md << 'EOF' || exit 1
 ## 五、行动系统设计
 
 [content here]
 EOF
 
   # Section 6: Recovery Budget
-  cat >> plans/2026/annual-plan-2026.md << 'EOF' || exit 1
+  cat >> 2026/annual-plan-2026.md << 'EOF' || exit 1
 ## 六、恢复与输入配额
 
 [content here]
 EOF
 
   # Section 7: 12-Week Rhythm
-  cat >> plans/2026/annual-plan-2026.md << 'EOF' || exit 1
+  cat >> 2026/annual-plan-2026.md << 'EOF' || exit 1
 ## 七、12周节奏规划
 
 [content here]
@@ -770,7 +783,7 @@ EOF
 *本文档为年度战略参考，建议每季度复盘时回顾调整*
 EOF
 
-} && echo "✓ Annual plan generated successfully at plans/2026/annual-plan-2026.md"
+} && echo "✓ Annual plan generated successfully at 2026/annual-plan-2026.md"
 ```
 
 **Important notes:**
@@ -843,7 +856,7 @@ For detailed templates, see:
 **IMPORTANT**: Before starting any planning session, check if the corresponding review exists:
 
 **For Annual Planning:**
-1. Check if annual review for the previous year exists: `plans/{previous_year}/annual-review-{previous_year}.md`
+1. Check if annual review for the previous year exists: `{previous_year}/annual-review-{previous_year}.md`
 2. If NOT found:
    - Inform the user: "I noticed you don't have an annual review for {previous_year}. Reviewing the past year helps identify patterns and set better goals."
    - Ask: "Would you like to create an annual review for {previous_year} first, or proceed directly to {current_year} planning?"
@@ -851,10 +864,10 @@ For detailed templates, see:
 3. If found, proceed with planning
 
 **For Monthly Planning:**
-1. **Check if annual plan exists** for current year: `plans/{year}/annual-plan-{year}.md`
+1. **Check if annual plan exists** for current year: `{year}/annual-plan-{year}.md`
    - If NOT found, suggest creating annual plan first
 
-2. **Check if previous month's review exists**: `plans/{year}/monthly-review-{year}-{previous_month}.md`
+2. **Check if previous month's review exists**: `{year}/{year}{previous_month}/monthly-review-{year}-{previous_month}.md`
    - **Exception**: If generating January plan, skip this check (no previous month in same year)
    - For Feb-Dec: If previous month review not found:
      - Inform the user: "I noticed you don't have a monthly review for {previous_month}. Reviewing execution helps improve future planning."
