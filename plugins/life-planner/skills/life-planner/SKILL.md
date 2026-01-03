@@ -305,34 +305,33 @@ Always use structured, dimension-specific questioning.
    - Flag if quarterly milestones don't sum to annual goals
    - When user needs monthly plans, explicitly use MONTHLY-PLAN-TEMPLATE.md
 
-9. **Post-Annual-Planning Monthly Planning Prompt**
+9. **Post-Annual-Planning: Next Steps Prompt**
    - After successfully generating the annual plan document, ask the user:
      ```
-     Your annual plan for {year} has been created successfully! 🎉
+     ✓ {year}年度计划已创建成功！
 
-     I can help you with two things now:
+     接下来您可以选择：
 
-     **1. Monthly Planning**
-     Would you like to create a monthly plan?
-     - Option A: Create monthly plan for the first month (e.g., January {year})
-     - Option B: Create monthly plan for a specific month (please specify)
-     - Option C: Skip monthly planning for now
+     **1. 拆分首月月度计划**
+     将年度计划拆分为首月({first_month}月)的具体行动计划
+     - Option A: 创建{first_month}月月度计划（推荐）
+     - Option B: 创建其他月份的月度计划（请指定月份）
+     - Option C: 暂不创建月度计划
 
-     **2. Calendar Integration**
-     Would you like to add your routines to your calendar?
-     - I can add daily/weekly/monthly routines from your annual plan to your calendar
-     - This includes routines from the "行动系统设计" section
-     - Option Y: Yes, add routines to calendar
-     - Option N: No, skip calendar integration
+     **2. 同步日历**
+     将年度Routine同步到您的日历应用
+     - 包含"行动系统设计"中的日常/每周/每月Routine
+     - Option Y: 同步到日历
+     - Option N: 暂不同步
 
-     Please let me know your preferences (e.g., "A and Y", "B for March and N", "C and Y", etc.)
+     请选择 (例如 "A和Y", "B 3月 和N", "C和Y"):
      ```
-   - **Monthly Planning Options:**
-     - If user chooses option A: Start monthly planning for January (or the first month of the planned year)
+   - **Monthly Planning Options (拆分月度):**
+     - If user chooses option A: Start monthly planning for first month (typically January for new year plans)
      - If user chooses option B: Ask which specific month they want to plan, then proceed with monthly planning for that month
-     - If user chooses option C: Skip monthly planning
-   - **Calendar Integration Options:**
-     - If user chooses option Y: Extract routines from annual plan and add to calendar (see Calendar Integration section below)
+     - If user chooses option C: Skip monthly planning, remind user "建议尽快创建首月计划，以便开始记录日常活动"
+   - **Calendar Integration Options (同步日历):**
+     - If user chooses option Y: Check if monthly plan exists first (see Calendar Integration Phase 11), then sync
      - If user chooses option N: Skip calendar integration
    - End the annual planning session after completing user's choices
 
@@ -376,6 +375,30 @@ Before starting the review, check if daily records exist for the review month:
 - Failure pattern identification - analyze patterns objectively: "I notice you've missed exercise goal 4 months in a row. The issue isn't motivation, it's [specific structural problem]. Here's my recommendation..."
 - Rolling adjustment for next month - propose realistic adjustments based on actual capacity, not wishful thinking
 
+**Post-Review: Next Month Planning Prompt**
+
+After completing the monthly review document generation, prompt user for next steps:
+
+```
+✓ {year}年{month}月 月度复盘已完成！
+
+您接下来想做什么？
+
+1. **创建下月计划** - 基于本月复盘结果，制定{next_month}月计划
+2. **结束本次会话** - 稍后再创建下月计划
+{3. **进行年度复盘** - 开始{year}年度复盘 (仅12月显示)}
+
+请选择:
+```
+
+- If user chooses 1: Start Monthly Planning workflow for next month
+- If user chooses 2: End session with reminder "记得在月初创建下月计划哦！"
+- If user chooses 3 (only shown if reviewing December): Start Annual Review workflow for that year
+
+**Month Calculation**:
+- If reviewing month 1-11: next_month = current_month + 1
+- If reviewing month 12: next_month = January of next year, and show option 3
+
 ### Calendar Integration (Phase 11)
 
 **When user confirms calendar integration after annual planning:**
@@ -386,7 +409,24 @@ Before starting the review, check if daily records exist for the review month:
    - Use `utils/calendar_integration.py` to parse routine tables
    - Extract daily/weekly/monthly routines into RoutineEvent objects
 
-2. **Validate**
+2. **Check Monthly Plan Existence**
+
+   Before generating calendar, check if first month's plan exists:
+
+   1. **Determine first month** of the planned year (typically January, or current month if mid-year)
+   2. **Check file**: `plans/{year}/monthly-plan-{year}-01.md`
+   3. **If NOT exists**:
+      - Inform user:
+        ```
+        ⚠️ 发现您还没有创建{year}年首月的月度计划。
+        建议先创建月度计划，将年度Routine落实到具体的月度行动中。
+        ```
+      - Ask: "是否先创建首月月度计划? (Y: 创建月度计划 / N: 继续同步日历)"
+      - If user chooses Y: Switch to Monthly Planning workflow for first month, then return to calendar sync
+      - If user chooses N: Proceed with calendar sync
+   4. **If exists**: Proceed with calendar sync
+
+3. **Validate**
    - Run `validate_routines()` to check:
      - **Time conflicts** (同一天内的时间冲突): Check if daily routines overlap
      - **Invalid time formats** (时间格式错误): Verify HH:MM or HH:MM-HH:MM format
@@ -397,7 +437,7 @@ Before starting the review, check if daily records exist for the review month:
      - Ask: "发现以上问题,是否继续生成日历文件? (y/n)"
      - If user confirms, proceed; otherwise abort
 
-3. **Generate .ics File**
+4. **Generate .ics File**
    - Auto-detect system timezone:
      ```python
      import datetime
@@ -408,7 +448,7 @@ Before starting the review, check if daily records exist for the review month:
    - Save to: `plans/{year}/routines-{year}.ics`
    - Verify file creation successful
 
-4. **Provide Import Instructions**
+5. **Provide Import Instructions**
    - Detect user's operating system
    - Generate platform-specific import guide:
      - **macOS**: "打开 Finder,找到文件并双击,系统日历应用会自动打开,点击'添加'导入"
@@ -488,7 +528,24 @@ When user input matches any of these patterns, activate Daily Record workflow:
    - `￥100` / `¥100` → 100元
    - If no amount found, leave as "-"
 
-5. **File Operations**
+5. **Pre-Check: Monthly Plan Existence**
+
+   Before adding any record, check if a monthly plan exists for the target month:
+
+   1. **Determine target month** from resolved date (step 2)
+   2. **Check file**: `plans/{year}/monthly-plan-{year}-{month}.md`
+   3. **If NOT exists**:
+      - Inform user:
+        ```
+        ⚠️ 当月({year}年{month}月)尚无月度计划。
+        建议先创建月度计划再添加记录，以便更好地追踪执行情况。
+        ```
+      - Ask: "是否继续添加记录? (Y: 继续添加 / N: 先创建月度计划)"
+      - If user chooses N: Switch to Monthly Planning workflow for that month
+      - If user chooses Y: Proceed with adding record (with warning noted)
+   4. **If exists**: Proceed with adding record
+
+6. **File Operations**
 
    **File path**: `plans/{year}/daily-records-{year}-{month}.md`
 
@@ -508,7 +565,7 @@ When user input matches any of these patterns, activate Daily Record workflow:
 
    **Use Bash heredoc for all file operations** to ensure single confirmation.
 
-6. **Confirmation**
+7. **Confirmation**
 
    After successful recording, confirm to user:
    ```
