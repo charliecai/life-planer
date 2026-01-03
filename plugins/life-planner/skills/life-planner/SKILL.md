@@ -346,7 +346,7 @@ Always use structured, dimension-specific questioning.
 
 Before starting the review, check if daily records exist for the review month:
 
-1. **Check file**: `{year}/{year}{month}/daily-records-{year}-{month}.md`
+1. **Check file**: `{year}/{year}{month}/daily-records-{year}{month}.md`
 2. **If exists**, read and present summary (Life Wheel 8 Dimensions):
    ```
    📊 Daily Records Summary for This Month (Life Wheel):
@@ -416,7 +416,7 @@ Please choose:
    Before generating calendar, check if first month's plan exists:
 
    1. **Determine first month** of the planned year (typically January, or current month if mid-year)
-   2. **Check file**: `{year}/{year}01/monthly-plan-{year}-01.md`
+   2. **Check file**: `{year}/{year}01/monthly-plan-{year}01.md`
    3. **If NOT exists**:
       - Inform user:
         ```
@@ -546,7 +546,7 @@ When user input matches any of these patterns, activate Daily Record workflow:
    Before adding any record, check if a monthly plan exists for the target month:
 
    1. **Determine target month** from resolved date (step 2)
-   2. **Check file**: `{year}/{year}{month}/monthly-plan-{year}-{month}.md`
+   2. **Check file**: `{year}/{year}{month}/monthly-plan-{year}{month}.md`
    3. **If NOT exists**:
       - Inform user:
         ```
@@ -560,7 +560,7 @@ When user input matches any of these patterns, activate Daily Record workflow:
 
 6. **File Operations**
 
-   **File path**: `{year}/{year}{month}/daily-records-{year}-{month}.md`
+   **File path**: `{year}/{year}{month}/daily-records-{year}{month}.md`
 
    Based on the resolved date, determine which month's file to update.
 
@@ -589,7 +589,7 @@ When user input matches any of these patterns, activate Daily Record workflow:
    Content: {content}
    {Amount: {amount}}  ← only for Wealth dimension
 
-   File: {year}/{year}{month}/daily-records-{year}-{month}.md
+   File: {year}/{year}{month}/daily-records-{year}{month}.md
    ```
 
 **Example Usage:**
@@ -599,7 +599,7 @@ User: record:ran 5km today
 → Date: 2026-01-03
 → Dimension: Health
 → Content: ran 5km today
-→ File: 2026/202601/daily-records-2026-01.md
+→ File: 2026/202601/daily-records-202601.md
 
 User: record:finished project presentation
 → Date: 2026-01-03
@@ -643,7 +643,7 @@ User: record:watched a movie, relaxed all day
 During Monthly Review (Phase 10), the system should leverage daily records:
 
 1. **Check for daily records file**
-   - Look for: `{year}/{year}{month}/daily-records-{year}-{month}.md`
+   - Look for: `{year}/{year}{month}/daily-records-{year}{month}.md`
    - If exists, read and extract summary data
 
 2. **Present summary to user (Life Wheel 8 Dimensions)**
@@ -701,9 +701,9 @@ When generating planning documents, use this directory structure:
 - Annual reviews: `{year}/annual-review-{year}.md`
 - Annual plans: `{year}/annual-plan-{year}.md`
 - Calendar files: `{year}/routines-{year}.ics`
-- Monthly reviews: `{year}/{year}{month}/monthly-review-{year}-{month}.md`
-- Monthly plans: `{year}/{year}{month}/monthly-plan-{year}-{month}.md`
-- Daily records: `{year}/{year}{month}/daily-records-{year}-{month}.md`
+- Monthly reviews: `{year}/{year}{month}/monthly-review-{year}{month}.md`
+- Monthly plans: `{year}/{year}{month}/monthly-plan-{year}{month}.md`
+- Daily records: `{year}/{year}{month}/daily-records-{year}{month}.md`
 
 **Directory structure example**:
 ```
@@ -712,9 +712,9 @@ When generating planning documents, use this directory structure:
 ├── annual-review-2026.md
 ├── routines-2026.ics
 ├── 202601/
-│   ├── monthly-plan-2026-01.md
-│   ├── monthly-review-2026-01.md
-│   └── daily-records-2026-01.md
+│   ├── monthly-plan-202601.md
+│   ├── monthly-review-202601.md
+│   └── daily-records-202601.md
 └── 202612/
     └── ...
 ```
@@ -918,7 +918,7 @@ For detailed templates, see:
 1. **Check if annual plan exists** for current year: `{year}/annual-plan-{year}.md`
    - If NOT found, suggest creating annual plan first
 
-2. **Check if previous month's review exists**: `{year}/{year}{previous_month}/monthly-review-{year}-{previous_month}.md`
+2. **Check if previous month's review exists**: `{year}/{year}{previous_month}/monthly-review-{year}{previous_month}.md`
    - **Exception**: If generating January plan, skip this check (no previous month in same year)
    - For Feb-Dec: If previous month review not found:
      - Inform the user: "I noticed you don't have a monthly review for {previous_month}. Reviewing execution helps improve future planning."
