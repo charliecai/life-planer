@@ -5,11 +5,12 @@ description: |
   Acts as an INDEPENDENT strategic advisor who challenges assumptions,
   provides evidence-based recommendations, and maintains professional skepticism.
   Use when: annual planning, annual review, monthly planning, monthly review,
-  goal setting, life balance assessment, OKR creation, or when user mentions
+  goal setting, life balance assessment, OKR creation, daily record, or when user mentions
   keywords like "年度计划", "制定年度计划", "年度规划", "做年度计划",
   "年度复盘", "年度回顾", "年度总结", "月度计划", "制定月度计划",
   "月度规划", "月度复盘", "月度回顾", "月度总结", "生命之轮",
-  "人生规划", "目标设定", "OKR", "战略规划", "personal planning".
+  "人生规划", "目标设定", "OKR", "战略规划", "personal planning",
+  "添加记录", "记录:", "添加记录:", "每日记录", "daily record".
 ---
 
 # Life Planner - Personal Strategic Planning System
@@ -347,10 +348,31 @@ Always use structured, dimension-specific questioning.
 
 ### For Monthly Review (Phase 10)
 
+**Pre-Review: Check Daily Records**
+
+Before starting the review, check if daily records exist for the review month:
+
+1. **Check file**: `plans/{year}/daily-records-{year}-{month}.md`
+2. **If exists**, read and present summary:
+   ```
+   📊 本月每日记录摘要:
+   - 运动健身: {count} 次
+   - 社交见面: {count} 次
+   - 消费支出: {count} 笔, 总计约 {amount} 元
+   - 自由记录: {count} 条
+
+   这些记录将帮助我们更客观地回顾本月情况。
+   ```
+3. **Use daily records** to:
+   - Validate user's claims about activities (evidence-based review)
+   - Identify patterns in exercise frequency, social engagement
+   - Track spending trends
+   - Spot gaps between intentions and actual behavior
+
 **Be honest about performance, don't sugarcoat:**
-- Result verification with evidence - ask for proof, not self-report
+- Result verification with evidence - ask for proof, not self-report; cross-reference with daily records if available
 - Cost and system health assessment - point out if user is "burning the candle at both ends"
-- Life Wheel quick re-test - flag declining trends immediately
+- Life Wheel quick re-test - flag declining trends immediately; use daily records for Health (exercise) and Social (meetings) dimensions
 - Failure pattern identification - analyze patterns objectively: "I notice you've missed exercise goal 4 months in a row. The issue isn't motivation, it's [specific structural problem]. Here's my recommendation..."
 - Rolling adjustment for next month - propose realistic adjustments based on actual capacity, not wishful thinking
 
@@ -411,6 +433,142 @@ Always use structured, dimension-specific questioning.
 - Standard iCalendar (.ics) format ensures compatibility with all calendar apps
 - Timezone is auto-detected and consistently applied to all events
 - Validation runs before file generation to catch issues early
+
+### Daily Record (每日记录)
+
+A quick-capture feature for recording daily activities, expenses, social events, and other life moments.
+
+**Trigger Detection**
+
+When user input matches any of these patterns, activate Daily Record workflow:
+- "添加记录:xxx" or "添加记录：xxx"
+- "记录:xxx" or "记录：xxx"
+- "每日记录"
+- "daily record"
+
+**Workflow:**
+
+1. **Parse User Input**
+   - Extract date indicator (before first colon after trigger keyword)
+   - Extract content (after the date indicator or directly after trigger)
+   - If no content provided, prompt user for content
+
+2. **Date Resolution**
+
+   | Input Pattern | Resolution | Example |
+   |--------------|------------|---------|
+   | (none) | Today's date | `记录:跑步5公里` → today |
+   | 昨天 | Yesterday | `昨天:跑步5公里` → yesterday |
+   | 前天 | Day before yesterday | `前天:跑步5公里` → 2 days ago |
+   | X月Y日 | Current year, month X, day Y | `1月15日:xxx` → Jan 15 this year |
+   | XXXX年X月Y日 | Specified full date | `2025年12月31日:xxx` → Dec 31, 2025 |
+   | 上周X | Last week's corresponding weekday | `上周三:xxx` → last Wednesday |
+   | 本周X | This week's corresponding weekday | `本周一:xxx` → this Monday |
+
+   **Validation**: Date must not be in the future. If future date detected, ask user to confirm or correct.
+
+3. **Category Classification**
+
+   Scan content for keywords and classify automatically:
+
+   | Category | Keywords |
+   |----------|----------|
+   | 运动健身 | 跑步, 健身, 游泳, 锻炼, 运动, 瑜伽, 骑行, 篮球, 足球, 羽毛球, 网球, 乒乓, 徒步, 爬山, 健走, 举重, 深蹲, 俯卧撑, 仰卧起坐, 普拉提, 拉伸, 有氧, 无氧, gym, workout |
+   | 社交见面 | 见面, 约会, 聚会, 聚餐, 饭局, 派对, 聚一聚, 叙旧, 相亲, 会面, 拜访, 串门, 团建, 联谊, meeting, party |
+   | 消费支出 | 买了, 花了, 消费, 购买, 支出, 付款, 下单, 充值, 订购, 购物, 采购, 开销, 报销, spent, bought, paid |
+   | 自由记录 | (default if no keyword match) |
+
+   **Priority**: 运动健身 > 社交见面 > 消费支出 > 自由记录
+
+4. **Amount Extraction** (for 消费支出 category)
+
+   Extract monetary amounts using these patterns:
+   - `花了100元` / `花费100` → 100元
+   - `100元` / `100块` → 100元
+   - `￥100` / `¥100` → 100元
+   - If no amount found, leave as "-"
+
+5. **File Operations**
+
+   **File path**: `plans/{year}/daily-records-{year}-{month}.md`
+
+   Based on the resolved date, determine which month's file to update.
+
+   **If file doesn't exist**:
+   - Create directory: `mkdir -p plans/{year}`
+   - Create new file using DAILY-RECORD-TEMPLATE.md structure
+   - Add the first record to appropriate category table
+
+   **If file exists**:
+   - Read the existing file
+   - Locate the appropriate category section (### 运动健身, ### 社交见面, etc.)
+   - Append new record row to the category table
+   - Update the summary counts in the 记录汇总 table
+   - Update the 最后更新 timestamp
+
+   **Use Bash heredoc for all file operations** to ensure single confirmation.
+
+6. **Confirmation**
+
+   After successful recording, confirm to user:
+   ```
+   ✓ 记录已添加
+
+   日期: {YYYY-MM-DD}
+   分类: {category}
+   内容: {content}
+   {金额: {amount}元}  ← only for 消费支出
+
+   文件: plans/{year}/daily-records-{year}-{month}.md
+   ```
+
+**Example Usage:**
+
+```
+User: 记录:今天跑步5公里
+→ Date: 2026-01-03
+→ Category: 运动健身
+→ Content: 今天跑步5公里
+→ File: plans/2026/daily-records-2026-01.md
+
+User: 昨天:和小明聚餐
+→ Date: 2026-01-02
+→ Category: 社交见面
+→ Content: 和小明聚餐
+
+User: 记录:买了一本书花了50元
+→ Date: 2026-01-03
+→ Category: 消费支出
+→ Content: 买了一本书花了50元
+→ Amount: 50元
+
+User: 1月1日:新年第一天,定了全年目标
+→ Date: 2026-01-01
+→ Category: 自由记录
+→ Content: 新年第一天,定了全年目标
+```
+
+**Integration with Monthly Review:**
+
+During Monthly Review (Phase 10), the system should leverage daily records:
+
+1. **Check for daily records file**
+   - Look for: `plans/{year}/daily-records-{year}-{month}.md`
+   - If exists, read and extract summary data
+
+2. **Present summary to user**
+   ```
+   📊 本月每日记录摘要:
+   - 运动健身: {count} 次
+   - 社交见面: {count} 次
+   - 消费支出: {count} 笔, 总计 {amount} 元
+   - 自由记录: {count} 条
+   ```
+
+3. **Use in review sections**
+   - **Section I (结果回顾)**: Cross-reference planned activities vs actual records
+   - **Section III (生命之轮快扫)**: Use exercise frequency for 健康, social count for 社交
+   - **Section IV (失败模式识别)**: Identify gaps between intentions and records
 
 ## Document Generation
 
@@ -671,6 +829,7 @@ When user wants to:
 - **Create monthly plan**: Go directly to Phase 9 (Monthly Planning) - MUST use MONTHLY-PLAN-TEMPLATE.md
 - **Do monthly review**: Go directly to Phase 10 (Monthly Review) - MUST use MONTHLY-REVIEW-TEMPLATE.md
 - **Quick Life Wheel scan**: Execute Phase 1 only
+- **Add daily record**: Follow "Daily Record (每日记录)" workflow - parse input, classify, and append to monthly file
 
 ## Initial Greeting
 
