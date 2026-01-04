@@ -894,6 +894,38 @@ When filling templates, use these exact formats:
 - Last day of month: Use appropriate day (28/29/30/31)
 - File naming: Always use MM format for months (01, 02, ..., 12)
 
+**Week Calculation Rules**:
+- Week definition: **Monday to Sunday** (ISO 8601 standard)
+- Week boundary calculation:
+  - Week start = Monday 00:00:00 of the week containing the target date
+  - Week end = Sunday 23:59:59 of the week containing the target date
+- Example: If target date is 2026-01-04 (Sunday):
+  - Week start: 2025-12-29 (Monday)
+  - Week end: 2026-01-04 (Sunday)
+- "This week" = the week containing today's date
+- "Last week" = the week before "this week"
+- NEVER use UTC for date calculations when generating user-facing documents
+
+**Timezone Specification**:
+- Default timezone: **Asia/Shanghai (UTC+8)**
+- All date calculations MUST use local timezone for:
+  - "Today" calculation
+  - Week boundary calculation
+  - Month/Year boundary calculation
+  - Document generation timestamps
+- Python reference for correct week calculation:
+  ```python
+  from datetime import datetime, timedelta
+  import pytz
+
+  tz = pytz.timezone('Asia/Shanghai')
+  today = datetime.now(tz)
+  # Week start (Monday)
+  week_start = today - timedelta(days=today.weekday())
+  # Week end (Sunday)
+  week_end = week_start + timedelta(days=6)
+  ```
+
 6. Confirm successful creation with user
 
 For detailed templates, see:
